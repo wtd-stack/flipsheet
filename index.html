@@ -7,172 +7,91 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --asphalt:#16181C;
-    --steel:#22262E;
-    --steel-2:#2B3038;
-    --paper:#F3F0E8;
-    --paper-2:#E9E4D8;
-    --ink:#1B1A16;
-    --ink-soft:#5A574E;
-    --amber:#F25C25;
-    --amber-deep:#C7430F;
-    --green:#2FA866;
-    --line:#3A3F48;
-    --line-paper:#CFC8B7;
-    --radius:14px;
-    --shadow:0 18px 50px rgba(0,0,0,.45);
+    --asphalt:#16181C;--steel:#22262E;--steel-2:#2B3038;--paper:#F3F0E8;--paper-2:#E9E4D8;
+    --ink:#1B1A16;--ink-soft:#5A574E;--amber:#F25C25;--amber-deep:#C7430F;--green:#2FA866;
+    --line:#3A3F48;--line-paper:#CFC8B7;--radius:14px;--shadow:0 18px 50px rgba(0,0,0,.45);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    background:var(--asphalt);
-    color:#E7E5DF;
-    font-family:'Inter',system-ui,sans-serif;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3,h4{margin:0}
-  button{font-family:inherit;cursor:pointer}
-  input,select,textarea{font-family:inherit}
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{background:var(--asphalt);color:#E7E5DF;font-family:'Inter',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{margin:0}button{font-family:inherit;cursor:pointer}input,select,textarea{font-family:inherit}
   .mono{font-family:'JetBrains Mono',monospace}
-
-  /* ---------- Top bar ---------- */
-  .topbar{
-    position:sticky;top:0;z-index:50;
-    display:flex;align-items:center;justify-content:space-between;
-    gap:16px;padding:14px 22px;
-    background:linear-gradient(180deg,#1b1e24,#16181c);
-    border-bottom:1px solid var(--line);
-  }
+  .banner{padding:10px 18px;font-size:13px;text-align:center;font-weight:600}
+  .banner.demo{background:#3a2a12;color:#f0c992;border-bottom:1px solid #5a4424}
+  .banner.live{background:#12321f;color:#8fe0b4;border-bottom:1px solid #1f5a39}
+  .banner.err{background:#3a1414;color:#f2a2a2;border-bottom:1px solid #5a2424}
+  .banner a{color:inherit;text-decoration:underline}
+  .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;background:linear-gradient(180deg,#1b1e24,#16181c);border-bottom:1px solid var(--line)}
   .brand{display:flex;align-items:center;gap:12px}
-  .brand .mark{
-    width:38px;height:38px;border-radius:9px;flex:none;
-    background:linear-gradient(135deg,var(--amber),var(--amber-deep));
-    display:grid;place-items:center;color:#fff;
-    box-shadow:0 6px 18px rgba(242,92,37,.35);
-  }
+  .brand .mark{width:38px;height:38px;border-radius:9px;flex:none;background:linear-gradient(135deg,var(--amber),var(--amber-deep));display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px rgba(242,92,37,.35)}
   .brand .mark svg{width:22px;height:22px}
-  .brand .name{
-    font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;
-    line-height:1;color:#fff;
-  }
+  .brand .name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;color:#fff}
   .brand .name span{color:var(--amber)}
   .brand .tag{font-size:11px;color:#8A8D94;letter-spacing:.3px;margin-top:1px}
-
-  .modes{display:flex;background:#0f1115;border:1px solid var(--line);border-radius:10px;padding:4px;gap:4px}
-  .modes button{
-    border:0;background:transparent;color:#9AA0A8;font-weight:600;font-size:13px;
-    padding:8px 16px;border-radius:7px;letter-spacing:.2px;
-  }
-  .modes button.active{background:var(--amber);color:#fff}
-
-  /* ---------- Layout ---------- */
-  .wrap{max-width:1240px;margin:0 auto;padding:24px 22px 80px;
-    display:grid;grid-template-columns:380px 1fr;gap:26px;align-items:start}
+  .opbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .opbtn{border:1px solid var(--line);background:#0f1115;color:#cfd2d8;font-weight:600;font-size:13px;padding:9px 14px;border-radius:9px}
+  .opbtn:hover{border-color:var(--amber);color:#fff}
+  .opbtn.amber{background:var(--amber);border-color:var(--amber);color:#fff}
+  .opbtn.amber:hover{background:var(--amber-deep)}
+  .who{font-size:12px;color:#8A8D94;margin-right:4px}
+  .wrap{max-width:1240px;margin:0 auto;padding:24px 22px 80px;display:grid;grid-template-columns:380px 1fr;gap:26px;align-items:start}
+  .wrap.solo{grid-template-columns:1fr}
   @media(max-width:1000px){.wrap{grid-template-columns:1fr;gap:18px}}
-
-  /* ---------- Editor panel ---------- */
-  .editor{
-    background:var(--steel);border:1px solid var(--line);border-radius:var(--radius);
-    position:sticky;top:88px;overflow:hidden;
-  }
+  .editor{background:var(--steel);border:1px solid var(--line);border-radius:var(--radius);position:sticky;top:96px;overflow:hidden}
   @media(max-width:1000px){.editor{position:static}}
-  .editor .ehead{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:16px 18px;border-bottom:1px solid var(--line);background:var(--steel-2);
-  }
+  .editor .ehead{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--steel-2)}
   .editor .ehead h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:20px;color:#fff}
-  .editor .ebody{padding:18px;max-height:none}
-  .field{margin-bottom:15px}
-  .field:last-child{margin-bottom:0}
-  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.7px;
-    color:#9AA0A8;font-weight:600;margin-bottom:6px}
-  .field input,.field select,.field textarea{
-    width:100%;background:#0f1115;border:1px solid var(--line);border-radius:9px;
-    color:#EDEBE5;padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s}
+  .editor .ebody{padding:18px}
+  .field{margin-bottom:15px}.field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#9AA0A8;font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:#0f1115;border:1px solid var(--line);border-radius:9px;color:#EDEBE5;padding:10px 12px;font-size:14px;outline:none;transition:border-color .15s}
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--amber)}
   .field textarea{resize:vertical;min-height:70px}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .row2 .field{margin-bottom:15px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row2 .field{margin-bottom:15px}
   .hint{font-size:11px;color:#7F838B;margin-top:5px}
-  .grouplabel{font-family:'Bebas Neue';letter-spacing:1.2px;font-size:16px;color:var(--amber);
-    margin:22px 0 12px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
+  .grouplabel{font-family:'Bebas Neue';letter-spacing:1.2px;font-size:16px;color:var(--amber);margin:22px 0 12px;padding-bottom:6px;border-bottom:1px dashed var(--line)}
   .grouplabel:first-child{margin-top:0}
-
-  .photoadd{display:flex;gap:8px}
-  .photoadd input{flex:1}
-  .minibtn{background:#0f1115;border:1px solid var(--line);color:#cfd2d8;border-radius:9px;
-    padding:0 14px;font-size:13px;font-weight:600;white-space:nowrap}
+  .photoadd{display:flex;gap:8px}.photoadd input{flex:1}
+  .minibtn{background:#0f1115;border:1px solid var(--line);color:#cfd2d8;border-radius:9px;padding:0 14px;font-size:13px;font-weight:600;white-space:nowrap}
   .minibtn:hover{border-color:var(--amber);color:#fff}
   .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
   .thumb{position:relative;width:64px;height:48px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb button{position:absolute;top:2px;right:2px;width:18px;height:18px;border:0;border-radius:50%;
-    background:rgba(0,0,0,.7);color:#fff;font-size:12px;line-height:1;display:grid;place-items:center}
-
-  .splitslider{margin-top:4px}
+  .thumb button{position:absolute;top:2px;right:2px;width:18px;height:18px;border:0;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:12px;line-height:1;display:grid;place-items:center}
   input[type=range]{width:100%;accent-color:var(--amber)}
-
-  .exrow{display:flex;gap:8px;margin-top:8px}
-  .ghost{background:transparent;border:1px solid var(--line);color:#cfd2d8;border-radius:9px;
-    padding:9px 12px;font-size:12.5px;font-weight:600;flex:1}
-  .ghost:hover{border-color:var(--amber);color:#fff}
-
-  /* ---------- Deal sheet (paper) ---------- */
+  .savebtn{width:100%;margin-top:8px;background:var(--amber);border:0;color:#fff;font-weight:700;font-size:15px;padding:13px;border-radius:11px}
+  .savebtn:hover{background:var(--amber-deep)}.savebtn:disabled{opacity:.5;cursor:default}
   .sheetwrap{min-width:0}
-  .sheet{
-    background:var(--paper);color:var(--ink);border-radius:var(--radius);overflow:hidden;
-    box-shadow:var(--shadow);border:1px solid #00000022;
-  }
-  .sheet-top{
-    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
-    padding:22px 26px 18px;background:linear-gradient(180deg,#1b1e24,#21252c);color:#fff;
-  }
+  .sheet{background:var(--paper);color:var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid #00000022}
+  .sheet-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:22px 26px 18px;background:linear-gradient(180deg,#1b1e24,#21252c);color:#fff}
   .eyebrow{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--amber);font-weight:700}
   .sheet-title{font-family:'Bebas Neue';font-size:46px;line-height:.92;letter-spacing:.5px;margin-top:6px}
   @media(max-width:560px){.sheet-title{font-size:34px}}
   .sheet-sub{color:#B9BCC3;font-size:13.5px;margin-top:6px}
-  .statuspill{flex:none;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-    background:var(--amber);color:#fff;padding:7px 12px;border-radius:20px;white-space:nowrap}
-
-  /* gallery */
+  .statuspill{flex:none;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--amber);color:#fff;padding:7px 12px;border-radius:20px;white-space:nowrap}
   .gallery{padding:18px 26px 4px}
-  .hero-photo{width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#d8d2c4;
-    border:1px solid var(--line-paper)}
+  .hero-photo{width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#d8d2c4;border:1px solid var(--line-paper)}
   .hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
   .gthumbs{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   .gthumb{width:78px;height:56px;border-radius:7px;overflow:hidden;border:2px solid transparent;cursor:pointer}
-  .gthumb.active{border-color:var(--amber)}
-  .gthumb img{width:100%;height:100%;object-fit:cover;display:block}
-
-  /* numbers */
+  .gthumb.active{border-color:var(--amber)}.gthumb img{width:100%;height:100%;object-fit:cover;display:block}
   .numbers{padding:20px 26px}
-  .numbers h3.block{font-family:'Bebas Neue';letter-spacing:1.5px;font-size:20px;color:var(--ink);
-    margin-bottom:12px;display:flex;align-items:center;gap:10px}
+  .numbers h3.block{font-family:'Bebas Neue';letter-spacing:1.5px;font-size:20px;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:10px}
   .numbers h3.block::after{content:"";flex:1;height:1px;background:var(--line-paper)}
-
   .ledger{border:1px solid var(--line-paper);border-radius:12px;overflow:hidden;background:#fff}
-  .lrow{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
-    border-bottom:1px solid var(--line-paper)}
-  .lrow:last-child{border-bottom:0}
-  .lrow .lab{font-size:13.5px;color:var(--ink-soft);font-weight:500}
+  .lrow{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line-paper)}
+  .lrow:last-child{border-bottom:0}.lrow .lab{font-size:13.5px;color:var(--ink-soft);font-weight:500}
   .lrow .val{font-family:'JetBrains Mono';font-size:15px;font-weight:500;color:var(--ink)}
-  .lrow.sumin{background:#F7F4EC}
-  .lrow.sumin .lab{color:var(--ink);font-weight:700}
-  .lrow.sumin .val{font-weight:700}
-
-  .profitcard{margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid #1f6b46;
-    background:linear-gradient(160deg,#1e2a23,#193b2b)}
+  .lrow.sumin{background:#F7F4EC}.lrow.sumin .lab{color:var(--ink);font-weight:700}.lrow.sumin .val{font-weight:700}
+  .profitcard{margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid #1f6b46;background:linear-gradient(160deg,#1e2a23,#193b2b)}
   .profitcard .pc-top{padding:16px 18px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
   .profitcard .pc-lab{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8fe0b4;font-weight:700}
   .profitcard .pc-roi{font-family:'JetBrains Mono';font-size:12px;color:#bfedd2}
   .profitcard .pc-num{font-family:'Bebas Neue';font-size:44px;letter-spacing:1px;color:#fff;padding:0 18px 4px;line-height:1}
   @media(max-width:560px){.profitcard .pc-num{font-size:34px}}
   .profitcard .pc-foot{padding:0 18px 16px;font-size:12.5px;color:#9fd9ba}
-
-  /* split */
   .splitbox{margin-top:16px;border:1px solid var(--line-paper);border-radius:12px;padding:16px;background:#fff}
   .splitbox .sb-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   .splitbox .sb-head h4{font-family:'Bebas Neue';letter-spacing:1px;font-size:18px}
@@ -180,125 +99,100 @@
   .splitbar .seg{display:flex;flex-direction:column;justify-content:center;padding:0 12px;color:#fff;min-width:0}
   .splitbar .seg .seg-lab{font-size:10px;letter-spacing:.5px;text-transform:uppercase;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .splitbar .seg .seg-pct{font-family:'JetBrains Mono';font-size:13px;font-weight:700}
-  .seg.a{background:linear-gradient(135deg,var(--amber),var(--amber-deep))}
-  .seg.b{background:linear-gradient(135deg,#3A4A5A,#2B3744)}
+  .seg.a{background:linear-gradient(135deg,var(--amber),var(--amber-deep))}.seg.b{background:linear-gradient(135deg,#3A4A5A,#2B3744)}
   .splitvals{display:flex;justify-content:space-between;margin-top:12px;gap:12px}
   .splitvals .sv{flex:1;text-align:center;border:1px solid var(--line-paper);border-radius:9px;padding:10px}
-  .splitvals .sv .n{font-family:'JetBrains Mono';font-weight:700;font-size:15px}
-  .splitvals .sv .l{font-size:11px;color:var(--ink-soft);margin-top:2px}
-
-  /* meta strip */
-  .metastrip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:16px;
-    border:1px solid var(--line-paper);border-radius:12px;overflow:hidden;background:#fff}
-  .metastrip .m{padding:14px;text-align:center;border-right:1px solid var(--line-paper)}
-  .metastrip .m:last-child{border-right:0}
+  .splitvals .sv .n{font-family:'JetBrains Mono';font-weight:700;font-size:15px}.splitvals .sv .l{font-size:11px;color:var(--ink-soft);margin-top:2px}
+  .metastrip{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;border:1px solid var(--line-paper);border-radius:12px;overflow:hidden;background:#fff}
+  .metastrip .m{padding:14px;text-align:center;border-right:1px solid var(--line-paper)}.metastrip .m:last-child{border-right:0}
   .metastrip .m .mi{font-family:'JetBrains Mono';font-size:18px;font-weight:700}
   .metastrip .m .ml{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
   @media(max-width:560px){.metastrip{grid-template-columns:1fr}.metastrip .m{border-right:0;border-bottom:1px solid var(--line-paper)}.metastrip .m:last-child{border-bottom:0}}
-
-  .desc{padding:4px 26px 22px}
-  .desc h3.block{font-family:'Bebas Neue';letter-spacing:1.5px;font-size:20px;margin-bottom:10px}
+  .desc{padding:4px 26px 22px}.desc h3.block{font-family:'Bebas Neue';letter-spacing:1.5px;font-size:20px;margin-bottom:10px}
   .desc p{font-size:14px;color:#3a382f;white-space:pre-wrap}
-
-  /* subscribe / cta */
   .cta{margin:0 26px 26px;border-radius:12px;background:#1b1e24;color:#fff;padding:20px;border:1px solid #000}
-  .cta h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:22px}
-  .cta p{font-size:13px;color:#B9BCC3;margin:6px 0 14px}
+  .cta h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:22px}.cta p{font-size:13px;color:#B9BCC3;margin:6px 0 14px}
   .subform{display:flex;gap:8px;flex-wrap:wrap}
-  .subform input{flex:1;min-width:160px;background:#0f1115;border:1px solid var(--line);color:#fff;
-    border-radius:9px;padding:11px 13px;font-size:14px;outline:none}
+  .subform input{flex:1;min-width:160px;background:#0f1115;border:1px solid var(--line);color:#fff;border-radius:9px;padding:11px 13px;font-size:14px;outline:none}
   .subform input:focus{border-color:var(--amber)}
-  .subform button{background:var(--amber);border:0;color:#fff;font-weight:700;border-radius:9px;
-    padding:11px 20px;font-size:14px}
+  .subform button{background:var(--amber);border:0;color:#fff;font-weight:700;border-radius:9px;padding:11px 20px;font-size:14px}
   .subnote{font-size:11.5px;color:#7F838B;margin-top:10px}
-
-  /* action bar */
   .actionbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
   .actionbar button{flex:1;min-width:150px;border-radius:11px;padding:13px;font-weight:700;font-size:14px;border:1px solid var(--line)}
-  .btn-primary{background:var(--amber);border-color:var(--amber)!important;color:#fff}
-  .btn-primary:hover{background:var(--amber-deep)}
-  .btn-dark{background:var(--steel);color:#EDEBE5}
-  .btn-dark:hover{border-color:var(--amber)}
-
-  /* subscriber list card */
+  .btn-primary{background:var(--amber);border-color:var(--amber)!important;color:#fff}.btn-primary:hover{background:var(--amber-deep)}
+  .btn-dark{background:var(--steel);color:#EDEBE5}.btn-dark:hover{border-color:var(--amber)}
   .subscard{margin-top:18px;background:var(--steel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
   .subscard h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:18px;color:#fff;margin-bottom:4px}
   .subscard .sc-sub{font-size:12px;color:#8A8D94;margin-bottom:12px}
-  .sublist{display:flex;flex-direction:column;gap:7px;max-height:200px;overflow:auto}
-  .subitem{display:flex;align-items:center;justify-content:space-between;background:#0f1115;
-    border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13px}
-  .subitem .who{display:flex;flex-direction:column}
-  .subitem .who .nm{font-weight:600}
-  .subitem .who .ct{font-size:11px;color:#8A8D94}
+  .sublist{display:flex;flex-direction:column;gap:7px;max-height:240px;overflow:auto}
+  .subitem{display:flex;align-items:center;justify-content:space-between;background:#0f1115;border:1px solid var(--line);border-radius:8px;padding:8px 11px;font-size:13px}
+  .subitem .nm{font-weight:600}.subitem .ct{font-size:11px;color:#8A8D94}
   .subitem button{background:transparent;border:0;color:#8A8D94;font-size:15px}
   .empty{font-size:12.5px;color:#7F838B;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:9px}
-
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:var(--green);color:#fff;font-weight:600;font-size:14px;padding:12px 20px;border-radius:11px;
-    box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s;z-index:200}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-  .infoline{font-size:11.5px;color:#8A8D94;margin-top:10px;line-height:1.5}
-  .infoline b{color:#cfd2d8}
-
-  /* print */
-  @media print{
-    body{background:#fff}
-    .topbar,.editor,.subscard,.actionbar,.cta,.modes{display:none!important}
-    .wrap{display:block;padding:0;max-width:100%}
-    .sheet{box-shadow:none;border:0}
-    .sheet-top,.profitcard{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  }
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;font-weight:600;font-size:14px;padding:12px 20px;border-radius:11px;box-shadow:0 12px 30px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.25s;z-index:200}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.bad{background:#c23b3b}
+  .modal-bg{position:fixed;inset:0;background:rgba(8,9,11,.7);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--steel);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:360px;box-shadow:var(--shadow)}
+  .modal h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:24px;color:#fff;margin-bottom:4px}
+  .modal p{font-size:12.5px;color:#8A8D94;margin-bottom:16px}
+  .modal input{width:100%;background:#0f1115;border:1px solid var(--line);color:#fff;border-radius:9px;padding:11px 13px;font-size:14px;outline:none;margin-bottom:10px}
+  .modal input:focus{border-color:var(--amber)}
+  .modal .mrow{display:flex;gap:8px;margin-top:6px}
+  .modal .mrow button{flex:1;border-radius:9px;padding:11px;font-weight:700;font-size:14px;border:1px solid var(--line)}
+  @media print{.banner,.topbar,.editor,.subscard,.actionbar,.cta,.modal-bg{display:none!important}body{background:#fff}.wrap{display:block;padding:0;max-width:100%}.sheet{box-shadow:none;border:0}.sheet-top,.profitcard{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
 
+<!-- ============================================================ -->
+<!--  STEP 1: paste your two Supabase values between the quotes.    -->
+<!--  Find them in Supabase -> Project Settings -> API.             -->
+<!--  Leaving them unchanged runs the page in safe "demo" mode.     -->
+<!-- ============================================================ -->
+<script>
+  const SUPABASE_URL      = "PASTE_YOUR_PROJECT_URL_HERE";   // e.g. https://abcd1234.supabase.co
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";      // the long "anon public" key
+</script>
+
+<div id="banner"></div>
+
 <div class="topbar">
   <div class="brand">
-    <div class="mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 13l2-5a3 3 0 0 1 3-2h8a3 3 0 0 1 3 2l2 5"/><path d="M5 13h14v4H5z"/>
-        <circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/>
-      </svg>
-    </div>
-    <div>
-      <div class="name">FLIP<span>SHEET</span></div>
-      <div class="tag">Build &amp; send car flip deals</div>
-    </div>
+    <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l2-5a3 3 0 0 1 3-2h8a3 3 0 0 1 3 2l2 5"/><path d="M5 13h14v4H5z"/><circle cx="7.5" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/></svg></div>
+    <div><div class="name">FLIP<span>SHEET</span></div><div class="tag">Build &amp; send car flip deals</div></div>
   </div>
-  <div class="modes">
-    <button id="mEdit" class="active" onclick="setMode('edit')">Build deal</button>
-    <button id="mPrev" onclick="setMode('preview')">Preview &amp; send</button>
-  </div>
+  <div class="opbar" id="opbar"></div>
 </div>
 
-<div class="wrap" id="wrap">
-  <!-- EDITOR -->
-  <div class="editor" id="editor">
+<div class="wrap solo" id="wrap">
+  <div class="editor" id="editor" style="display:none">
     <div class="ehead"><h3>Deal builder</h3></div>
-    <div class="ebody" id="editorBody"><!-- form injected --></div>
+    <div class="ebody" id="editorBody"></div>
   </div>
-
-  <!-- SHEET -->
   <div class="sheetwrap">
-    <div class="sheet" id="sheet"><!-- sheet injected --></div>
-
+    <div class="sheet" id="sheet"></div>
     <div class="actionbar">
       <button class="btn-primary" onclick="copyOffer()">Copy offer text</button>
       <button class="btn-dark" onclick="window.print()">Print / Save PDF</button>
-      <button class="btn-dark" onclick="exportDeal()">Save deal file</button>
-      <button class="btn-dark" onclick="document.getElementById('importFile').click()">Open deal file</button>
-      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importDeal(event)">
     </div>
-
-    <div class="subscard">
+    <div class="subscard" id="subscard" style="display:none">
       <h3>Subscribers</h3>
-      <div class="sc-sub">People who opted in to receive your deals. (Demo list — see note below on real sending.)</div>
+      <div class="sc-sub">People who opted in, saved in your database. Only you can see this.</div>
       <div class="sublist" id="sublist"></div>
-      <div class="infoline">
-        <b>About emailing &amp; texting the offer:</b> A page like this can't send email or SMS on its own — sending to a list needs a small backend service.
-        Today you can use <b>Copy offer text</b> and paste it into your email or Messages app. When you're ready to automate, the usual setup is an email service (SendGrid / Mailgun / Resend) and an SMS service (Twilio) wired to a stored subscriber list. I can spec that out for you.
-      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="loginModal">
+  <div class="modal">
+    <h3>Operator login</h3>
+    <p>Sign in to edit the deal and view subscribers.</p>
+    <input id="loginEmail" type="email" placeholder="Email" autocomplete="username">
+    <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="mrow">
+      <button class="btn-dark" onclick="closeLogin()">Cancel</button>
+      <button class="btn-primary" onclick="doLogin()">Sign in</button>
     </div>
   </div>
 </div>
@@ -306,212 +200,86 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------------- State ---------------- */
-const CAR_SVG = (hex1,hex2) => `data:image/svg+xml;utf8,`+encodeURIComponent(
-`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'>
-<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'>
-<stop offset='0' stop-color='${hex1}'/><stop offset='1' stop-color='${hex2}'/></linearGradient></defs>
-<rect width='320' height='180' fill='url(#g)'/>
-<g fill='none' stroke='rgba(255,255,255,.85)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'>
-<path d='M50 112 l18 -34 a14 14 0 0 1 12 -7 h84 a14 14 0 0 1 12 7 l18 34'/>
-<path d='M40 112 h214 v22 h-214 z'/>
-<circle cx='84' cy='134' r='13'/><circle cx='210' cy='134' r='13'/></g>
-<text x='160' y='164' fill='rgba(255,255,255,.7)' font-family='monospace' font-size='12' text-anchor='middle'>add a photo</text>
-</svg>`);
+const CONNECTED = SUPABASE_URL.indexOf("http")===0 && SUPABASE_ANON_KEY.length>20 && typeof window.supabase!=="undefined";
+let sb=null;
+if(CONNECTED){try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}catch(e){console.error(e);}}
+let session=null;
+let isOperator=!CONNECTED;
+let editing=false, showSubs=false;
 
-let deal = {
-  status:"Open opportunity",
-  year:"1972", make:"Datsun", model:"240Z", trim:"Series 1 Coupe",
-  photos:[ CAR_SVG('#cf6a3d','#8a3d1d'), CAR_SVG('#3a4a5a','#222c36'), CAR_SVG('#4c6b4a','#2c3f2b') ],
-  purchase:8500,
-  repairs:14000,
-  sellLow:38000, sellHigh:46000,
-  weeks:16,
-  splitA:50, partyA:"You (operator)", partyB:"Opportunity partner",
-  desc:"Numbers-matching S30 found in a dry barn outside Tulsa. Solid floors and frame rails, surface rust only. Plan: full mechanical refresh, respray in original 918 orange, new interior, and a sympathetic restoration that keeps the L24 stock. Strong, rising market for clean early Zs — comparable cars are clearing $40k+ at auction."
-};
-let activePhoto = 0;
-let subscribers = [];
+const CAR_SVG=(a,b)=>`data:image/svg+xml;utf8,`+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${a}'/><stop offset='1' stop-color='${b}'/></linearGradient></defs><rect width='320' height='180' fill='url(#g)'/><g fill='none' stroke='rgba(255,255,255,.85)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><path d='M50 112 l18 -34 a14 14 0 0 1 12 -7 h84 a14 14 0 0 1 12 7 l18 34'/><path d='M40 112 h214 v22 h-214 z'/><circle cx='84' cy='134' r='13'/><circle cx='210' cy='134' r='13'/></g><text x='160' y='164' fill='rgba(255,255,255,.7)' font-family='monospace' font-size='12' text-anchor='middle'>add a photo</text></svg>`);
+function sampleDeal(){return{status:"Open opportunity",year:"1972",make:"Datsun",model:"240Z",trim:"Series 1 Coupe",photos:[CAR_SVG('#cf6a3d','#8a3d1d'),CAR_SVG('#3a4a5a','#222c36'),CAR_SVG('#4c6b4a','#2c3f2b')],purchase:8500,repairs:14000,sellLow:38000,sellHigh:46000,weeks:16,splitA:50,partyA:"You (operator)",partyB:"Opportunity partner",desc:"Numbers-matching S30 found in a dry barn outside Tulsa. Solid floors and frame rails, surface rust only. Plan: full mechanical refresh, respray in original 918 orange, new interior, sympathetic restoration keeping the L24 stock. Strong, rising market for clean early Zs."};}
 
-/* ---------------- Helpers ---------------- */
-const $ = s => document.querySelector(s);
-const money = n => "$"+(Math.round(n)||0).toLocaleString("en-US");
-function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+let dealId=null, deal=sampleDeal(), activePhoto=0, subscribers=[];
 
-function calc(){
-  const totalIn = (+deal.purchase||0)+(+deal.repairs||0);
-  const profLow = (+deal.sellLow||0)-totalIn;
-  const profHigh = (+deal.sellHigh||0)-totalIn;
-  const roiLow = totalIn? (profLow/totalIn*100):0;
-  const roiHigh = totalIn? (profHigh/totalIn*100):0;
-  const aLow = profLow*deal.splitA/100, aHigh = profHigh*deal.splitA/100;
-  const bLow = profLow*(100-deal.splitA)/100, bHigh = profHigh*(100-deal.splitA)/100;
-  return {totalIn,profLow,profHigh,roiLow,roiHigh,aLow,aHigh,bLow,bHigh};
-}
+const $=s=>document.querySelector(s);
+const money=n=>"$"+(Math.round(n)||0).toLocaleString("en-US");
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function toast(msg,bad){const t=$("#toast");t.textContent=msg;t.classList.toggle("bad",!!bad);t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600);}
+function calc(){const totalIn=(+deal.purchase||0)+(+deal.repairs||0);const profLow=(+deal.sellLow||0)-totalIn,profHigh=(+deal.sellHigh||0)-totalIn;const roiLow=totalIn?profLow/totalIn*100:0,roiHigh=totalIn?profHigh/totalIn*100:0;return{totalIn,profLow,profHigh,roiLow,roiHigh,aLow:profLow*deal.splitA/100,aHigh:profHigh*deal.splitA/100,bLow:profLow*(100-deal.splitA)/100,bHigh:profHigh*(100-deal.splitA)/100};}
 
-/* ---------------- Editor ---------------- */
-function renderEditor(){
-  $("#editorBody").innerHTML = `
-    <div class="grouplabel">The car</div>
-    <div class="row2">
-      <div class="field"><label>Year</label><input value="${esc(deal.year)}" oninput="upd('year',this.value)"></div>
-      <div class="field"><label>Make</label><input value="${esc(deal.make)}" oninput="upd('make',this.value)"></div>
-    </div>
-    <div class="row2">
-      <div class="field"><label>Model</label><input value="${esc(deal.model)}" oninput="upd('model',this.value)"></div>
-      <div class="field"><label>Trim / detail</label><input value="${esc(deal.trim)}" oninput="upd('trim',this.value)"></div>
-    </div>
-    <div class="field"><label>Status badge</label><input value="${esc(deal.status)}" oninput="upd('status',this.value)"></div>
+function renderBanner(msg,kind){const b=$("#banner");if(!CONNECTED){b.className="banner demo";b.innerHTML="Demo mode — nothing is saved online yet. Add your Supabase keys near the top of this file (see the setup guide) to go live.";return;}if(msg){b.className="banner "+(kind||"live");b.textContent=msg;}else{b.className="banner live";b.textContent=session?("Live · signed in as "+(session.user&&session.user.email||"operator")):"Live · connected to your database";}}
 
-    <div class="grouplabel">Photos</div>
-    <div class="field">
-      <div class="photoadd">
-        <input id="photoUrl" placeholder="Paste an image URL…">
-        <button class="minibtn" onclick="addPhotoUrl()">Add</button>
-      </div>
-      <div class="hint">or <label style="color:var(--amber);cursor:pointer;text-decoration:underline">upload from device<input type="file" accept="image/*" multiple style="display:none" onchange="addPhotoFiles(event)"></label></div>
-      <div class="thumbs" id="editThumbs"></div>
-    </div>
+function renderOpbar(){const o=$("#opbar");if(!CONNECTED){o.innerHTML=`<span class="who">demo preview</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button>`;return;}if(session){o.innerHTML=`<span class="who">${esc(session.user&&session.user.email||'operator')}</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button><button class="opbtn" onclick="toggleSubs()">Subscribers</button><button class="opbtn" onclick="doLogout()">Log out</button>`;}else{o.innerHTML=`<button class="opbtn amber" onclick="openLogin()">Operator login</button>`;}}
 
-    <div class="grouplabel">The numbers</div>
-    <div class="field"><label>Purchase cost</label><input type="number" value="${deal.purchase}" oninput="upd('purchase',+this.value)"></div>
-    <div class="field"><label>Projected repairs &amp; restoration</label><input type="number" value="${deal.repairs}" oninput="upd('repairs',+this.value)"></div>
-    <div class="row2">
-      <div class="field"><label>Sell price — low</label><input type="number" value="${deal.sellLow}" oninput="upd('sellLow',+this.value)"></div>
-      <div class="field"><label>Sell price — high</label><input type="number" value="${deal.sellHigh}" oninput="upd('sellHigh',+this.value)"></div>
-    </div>
-    <div class="field"><label>Turnaround (weeks)</label><input type="number" value="${deal.weeks}" oninput="upd('weeks',+this.value)"></div>
+function toggleEdit(){editing=!editing;if(editing)showSubs=false;renderAll();}
+function toggleSubs(){showSubs=!showSubs;if(showSubs){editing=false;loadSubscribers();}renderAll();}
 
-    <div class="grouplabel">Profit split</div>
-    <div class="row2">
-      <div class="field"><label>Party A label</label><input value="${esc(deal.partyA)}" oninput="upd('partyA',this.value)"></div>
-      <div class="field"><label>Party B label</label><input value="${esc(deal.partyB)}" oninput="upd('partyB',this.value)"></div>
-    </div>
-    <div class="field">
-      <label>Party A keeps: <span class="mono" id="splitPctLbl">${deal.splitA}%</span></label>
-      <input class="splitslider" type="range" min="0" max="100" step="5" value="${deal.splitA}"
-        oninput="upd('splitA',+this.value); $('#splitPctLbl').textContent=this.value+'%'">
-    </div>
-
-    <div class="grouplabel">Description</div>
-    <div class="field"><textarea oninput="upd('desc',this.value)">${esc(deal.desc)}</textarea></div>
-  `;
-  renderEditThumbs();
-}
-function renderEditThumbs(){
-  const c = $("#editThumbs"); if(!c) return;
-  c.innerHTML = deal.photos.map((p,i)=>`
-    <div class="thumb"><img src="${p}" alt=""><button onclick="removePhoto(${i})">×</button></div>
-  `).join("") || `<div class="hint">No photos yet.</div>`;
-}
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-
-function upd(k,v){ deal[k]=v; renderSheet(); if(k==='splitA'){/* keep slider label only*/} }
+function renderEditor(){$("#editorBody").innerHTML=`
+  <div class="grouplabel">The car</div>
+  <div class="row2"><div class="field"><label>Year</label><input value="${esc(deal.year)}" oninput="upd('year',this.value)"></div><div class="field"><label>Make</label><input value="${esc(deal.make)}" oninput="upd('make',this.value)"></div></div>
+  <div class="row2"><div class="field"><label>Model</label><input value="${esc(deal.model)}" oninput="upd('model',this.value)"></div><div class="field"><label>Trim / detail</label><input value="${esc(deal.trim)}" oninput="upd('trim',this.value)"></div></div>
+  <div class="field"><label>Status badge</label><input value="${esc(deal.status)}" oninput="upd('status',this.value)"></div>
+  <div class="grouplabel">Photos</div>
+  <div class="field"><div class="photoadd"><input id="photoUrl" placeholder="Paste an image URL…"><button class="minibtn" onclick="addPhotoUrl()">Add</button></div>
+    <div class="hint">or <label style="color:var(--amber);cursor:pointer;text-decoration:underline">upload from device<input type="file" accept="image/*" multiple style="display:none" onchange="addPhotoFiles(event)"></label> (auto-resized to keep your database light)</div>
+    <div class="thumbs" id="editThumbs"></div></div>
+  <div class="grouplabel">The numbers</div>
+  <div class="field"><label>Purchase cost</label><input type="number" value="${deal.purchase}" oninput="upd('purchase',+this.value)"></div>
+  <div class="field"><label>Projected repairs &amp; restoration</label><input type="number" value="${deal.repairs}" oninput="upd('repairs',+this.value)"></div>
+  <div class="row2"><div class="field"><label>Sell price — low</label><input type="number" value="${deal.sellLow}" oninput="upd('sellLow',+this.value)"></div><div class="field"><label>Sell price — high</label><input type="number" value="${deal.sellHigh}" oninput="upd('sellHigh',+this.value)"></div></div>
+  <div class="field"><label>Turnaround (weeks)</label><input type="number" value="${deal.weeks}" oninput="upd('weeks',+this.value)"></div>
+  <div class="grouplabel">Profit split</div>
+  <div class="row2"><div class="field"><label>Party A label</label><input value="${esc(deal.partyA)}" oninput="upd('partyA',this.value)"></div><div class="field"><label>Party B label</label><input value="${esc(deal.partyB)}" oninput="upd('partyB',this.value)"></div></div>
+  <div class="field"><label>Party A keeps: <span class="mono" id="splitPctLbl">${deal.splitA}%</span></label><input type="range" min="0" max="100" step="5" value="${deal.splitA}" oninput="upd('splitA',+this.value); $('#splitPctLbl').textContent=this.value+'%'"></div>
+  <div class="grouplabel">Description</div>
+  <div class="field"><textarea oninput="upd('desc',this.value)">${esc(deal.desc)}</textarea></div>
+  <button class="savebtn" id="saveBtn" onclick="saveDeal()">${CONNECTED?'Save to site':'Save (demo — not online)'}</button>
+  <div class="hint" style="text-align:center">${CONNECTED?'Visitors will see the saved version.':'Add Supabase keys to save for real.'}</div>`;
+  renderEditThumbs();}
+function renderEditThumbs(){const c=$("#editThumbs");if(!c)return;c.innerHTML=deal.photos.map((p,i)=>`<div class="thumb"><img src="${p}" alt=""><button onclick="removePhoto(${i})">×</button></div>`).join("")||`<div class="hint">No photos yet.</div>`;}
+function upd(k,v){deal[k]=v;renderSheet();}
 function addPhotoUrl(){const i=$("#photoUrl");if(i.value.trim()){deal.photos.push(i.value.trim());i.value="";renderEditThumbs();renderSheet();}}
-function addPhotoFiles(e){
-  [...e.target.files].forEach(f=>{const r=new FileReader();r.onload=()=>{deal.photos.push(r.result);renderEditThumbs();renderSheet();};r.readAsDataURL(f);});
-  e.target.value="";
-}
+function addPhotoFiles(e){[...e.target.files].forEach(f=>downscale(f,d=>{deal.photos.push(d);renderEditThumbs();renderSheet();}));e.target.value="";}
+function downscale(file,cb){const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1280;let w=img.width,h=img.height;if(w>max){h=h*max/w;w=max;}const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);cb(c.toDataURL("image/jpeg",0.82));};img.src=r.result;};r.readAsDataURL(file);}
 function removePhoto(i){deal.photos.splice(i,1);if(activePhoto>=deal.photos.length)activePhoto=0;renderEditThumbs();renderSheet();}
 
-/* ---------------- Sheet ---------------- */
-function renderSheet(){
-  const c = calc();
-  const title = [deal.year,deal.make,deal.model].filter(Boolean).join(" ");
-  const photos = deal.photos.length?deal.photos:[CAR_SVG('#888','#555')];
-  if(activePhoto>=photos.length)activePhoto=0;
+function renderSheet(){const c=calc();const title=[deal.year,deal.make,deal.model].filter(Boolean).join(" ");const photos=deal.photos.length?deal.photos:[CAR_SVG('#888','#555')];if(activePhoto>=photos.length)activePhoto=0;
+  $("#sheet").innerHTML=`
+  <div class="sheet-top"><div><div class="eyebrow">Restoration flip opportunity</div><div class="sheet-title">${esc(title||"Untitled car")}</div><div class="sheet-sub">${esc(deal.trim||"")}</div></div>${deal.status?`<div class="statuspill">${esc(deal.status)}</div>`:""}</div>
+  <div class="gallery"><div class="hero-photo"><img src="${photos[activePhoto]}" alt="${esc(title)}"></div>${photos.length>1?`<div class="gthumbs">${photos.map((p,i)=>`<div class="gthumb ${i===activePhoto?'active':''}" onclick="activePhoto=${i};renderSheet()"><img src="${p}" alt=""></div>`).join("")}</div>`:""}</div>
+  <div class="numbers"><h3 class="block">The numbers</h3>
+    <div class="ledger"><div class="lrow"><span class="lab">Purchase cost</span><span class="val">${money(deal.purchase)}</span></div><div class="lrow"><span class="lab">Repairs &amp; restoration</span><span class="val">${money(deal.repairs)}</span></div><div class="lrow sumin"><span class="lab">Total invested</span><span class="val">${money(c.totalIn)}</span></div><div class="lrow"><span class="lab">Target sell range</span><span class="val">${money(deal.sellLow)} – ${money(deal.sellHigh)}</span></div></div>
+    <div class="profitcard"><div class="pc-top"><span class="pc-lab">Projected profit</span><span class="pc-roi">ROI ${c.roiLow.toFixed(0)}% – ${c.roiHigh.toFixed(0)}%</span></div><div class="pc-num">${money(c.profLow)} – ${money(c.profHigh)}</div><div class="pc-foot">After ${esc(deal.weeks||"?")} weeks, before selling fees &amp; taxes.</div></div>
+    <div class="splitbox"><div class="sb-head"><h4>Profit split</h4></div><div class="splitbar"><div class="seg a" style="flex:${Math.max(deal.splitA,8)}"><span class="seg-lab">${esc(deal.partyA)}</span><span class="seg-pct">${deal.splitA}%</span></div><div class="seg b" style="flex:${Math.max(100-deal.splitA,8)}"><span class="seg-lab">${esc(deal.partyB)}</span><span class="seg-pct">${100-deal.splitA}%</span></div></div><div class="splitvals"><div class="sv"><div class="n">${money(c.aLow)} – ${money(c.aHigh)}</div><div class="l">${esc(deal.partyA)}</div></div><div class="sv"><div class="n">${money(c.bLow)} – ${money(c.bHigh)}</div><div class="l">${esc(deal.partyB)}</div></div></div></div>
+    <div class="metastrip"><div class="m"><div class="mi">${money(c.totalIn)}</div><div class="ml">Cash in</div></div><div class="m"><div class="mi">${esc(deal.weeks||"—")} wks</div><div class="ml">Turnaround</div></div><div class="m"><div class="mi">${c.roiLow.toFixed(0)}–${c.roiHigh.toFixed(0)}%</div><div class="ml">Return on cost</div></div></div></div>
+  ${deal.desc?`<div class="desc"><h3 class="block">The opportunity</h3><p>${esc(deal.desc)}</p></div>`:""}
+  <div class="cta"><h3>Want first call on deals like this?</h3><p>Drop your details and get new flip opportunities sent straight to you.</p><div class="subform"><input id="subName" placeholder="Name"><input id="subContact" placeholder="Email or phone"><button onclick="subscribe()">Notify me</button></div><div class="subnote">By subscribing you agree to receive deal offers. Unsubscribe anytime.</div></div>`;}
 
-  $("#sheet").innerHTML = `
-    <div class="sheet-top">
-      <div>
-        <div class="eyebrow">Restoration flip opportunity</div>
-        <div class="sheet-title">${esc(title||"Untitled car")}</div>
-        <div class="sheet-sub">${esc(deal.trim||"")}</div>
-      </div>
-      ${deal.status?`<div class="statuspill">${esc(deal.status)}</div>`:""}
-    </div>
+async function loadDeal(){if(!sb)return;const {data,error}=await sb.from("deals").select("*").order("updated_at",{ascending:false}).limit(1);if(error){renderBanner("Couldn't load deal: "+error.message,"err");return;}if(data&&data.length){dealId=data[0].id;deal=Object.assign(sampleDeal(),data[0].data);}activePhoto=0;renderAll();}
+async function saveDeal(){if(!sb){toast("Demo mode — add Supabase keys to save online");return;}if(!session){toast("Please log in first",true);openLogin();return;}const btn=$("#saveBtn");if(btn){btn.disabled=true;btn.textContent="Saving…";}let res;if(dealId){res=await sb.from("deals").update({data:deal,updated_at:new Date().toISOString()}).eq("id",dealId).select().single();}else{res=await sb.from("deals").insert({data:deal,published:true}).select().single();}if(res.error){toast("Save failed: "+res.error.message,true);}else{dealId=res.data.id;toast("Saved — visitors now see this");}if(btn){btn.disabled=false;btn.textContent=CONNECTED?'Save to site':'Save';}}
 
-    <div class="gallery">
-      <div class="hero-photo"><img src="${photos[activePhoto]}" alt="${esc(title)}"></div>
-      ${photos.length>1?`<div class="gthumbs">${photos.map((p,i)=>`
-        <div class="gthumb ${i===activePhoto?'active':''}" onclick="activePhoto=${i};renderSheet()"><img src="${p}" alt=""></div>`).join("")}</div>`:""}
-    </div>
+async function subscribe(){const n=$("#subName").value.trim(),ct=$("#subContact").value.trim();if(!ct){toast("Add an email or phone first",true);return;}if(!sb){subscribers.unshift({name:n||"(no name)",contact:ct,created_at:new Date().toISOString()});$("#subName").value="";$("#subContact").value="";toast("Subscribed (demo)");return;}const {error}=await sb.from("subscribers").insert({name:n||null,contact:ct,deal_id:dealId});if(error){toast("Couldn't subscribe: "+error.message,true);return;}$("#subName").value="";$("#subContact").value="";toast("Subscribed ✓");if(session&&showSubs)loadSubscribers();}
+async function loadSubscribers(){if(!sb||!session){renderSubs();return;}const {data,error}=await sb.from("subscribers").select("*").order("created_at",{ascending:false});if(error){toast("Couldn't load subscribers: "+error.message,true);return;}subscribers=data||[];renderSubs();}
+function renderSubs(){const c=$("#sublist");if(!c)return;c.innerHTML=subscribers.length?subscribers.map(s=>`<div class="subitem"><div><div class="nm">${esc(s.name||"(no name)")}</div><div class="ct">${esc(s.contact)} · ${esc((s.created_at||"").slice(0,10))}</div></div>${s.id?`<button title="Remove" onclick="delSub('${s.id}')">×</button>`:""}</div>`).join(""):`<div class="empty">No subscribers yet. Sign-ups from the deal sheet appear here.</div>`;}
+async function delSub(id){if(!sb)return;const {error}=await sb.from("subscribers").delete().eq("id",id);if(error){toast(error.message,true);return;}loadSubscribers();}
 
-    <div class="numbers">
-      <h3 class="block">The numbers</h3>
-      <div class="ledger">
-        <div class="lrow"><span class="lab">Purchase cost</span><span class="val">${money(deal.purchase)}</span></div>
-        <div class="lrow"><span class="lab">Repairs &amp; restoration</span><span class="val">${money(deal.repairs)}</span></div>
-        <div class="lrow sumin"><span class="lab">Total invested</span><span class="val">${money(c.totalIn)}</span></div>
-        <div class="lrow"><span class="lab">Target sell range</span><span class="val">${money(deal.sellLow)} – ${money(deal.sellHigh)}</span></div>
-      </div>
+function openLogin(){$("#loginModal").classList.add("show");setTimeout(()=>$("#loginEmail").focus(),50);}
+function closeLogin(){$("#loginModal").classList.remove("show");}
+async function doLogin(){if(!sb){toast("Not connected",true);return;}const email=$("#loginEmail").value.trim(),password=$("#loginPass").value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){toast(error.message,true);return;}session=data.session;closeLogin();$("#loginPass").value="";toast("Signed in");isOperator=true;renderAll();}
+async function doLogout(){if(sb)await sb.auth.signOut();session=null;isOperator=false;editing=false;showSubs=false;renderAll();}
 
-      <div class="profitcard">
-        <div class="pc-top">
-          <span class="pc-lab">Projected profit</span>
-          <span class="pc-roi">ROI ${c.roiLow.toFixed(0)}% – ${c.roiHigh.toFixed(0)}%</span>
-        </div>
-        <div class="pc-num">${money(c.profLow)} – ${money(c.profHigh)}</div>
-        <div class="pc-foot">After ${esc(deal.weeks||"?")} weeks, before selling fees &amp; taxes.</div>
-      </div>
-
-      <div class="splitbox">
-        <div class="sb-head"><h4>Profit split</h4></div>
-        <div class="splitbar">
-          <div class="seg a" style="flex:${Math.max(deal.splitA,8)}">
-            <span class="seg-lab">${esc(deal.partyA)}</span><span class="seg-pct">${deal.splitA}%</span></div>
-          <div class="seg b" style="flex:${Math.max(100-deal.splitA,8)}">
-            <span class="seg-lab">${esc(deal.partyB)}</span><span class="seg-pct">${100-deal.splitA}%</span></div>
-        </div>
-        <div class="splitvals">
-          <div class="sv"><div class="n">${money(c.aLow)} – ${money(c.aHigh)}</div><div class="l">${esc(deal.partyA)}</div></div>
-          <div class="sv"><div class="n">${money(c.bLow)} – ${money(c.bHigh)}</div><div class="l">${esc(deal.partyB)}</div></div>
-        </div>
-      </div>
-
-      <div class="metastrip">
-        <div class="m"><div class="mi">${money(c.totalIn)}</div><div class="ml">Cash in</div></div>
-        <div class="m"><div class="mi">${esc(deal.weeks||"—")} wks</div><div class="ml">Turnaround</div></div>
-        <div class="m"><div class="mi">${c.roiLow.toFixed(0)}–${c.roiHigh.toFixed(0)}%</div><div class="ml">Return on cost</div></div>
-      </div>
-    </div>
-
-    ${deal.desc?`<div class="desc"><h3 class="block">The opportunity</h3><p>${esc(deal.desc)}</p></div>`:""}
-
-    <div class="cta">
-      <h3>Want first call on deals like this?</h3>
-      <p>Drop your details and get new flip opportunities sent straight to you.</p>
-      <div class="subform">
-        <input id="subName" placeholder="Name">
-        <input id="subContact" placeholder="Email or phone">
-        <button onclick="subscribe()">Notify me</button>
-      </div>
-      <div class="subnote">By subscribing you agree to receive deal offers. Unsubscribe anytime.</div>
-    </div>
-  `;
-}
-
-/* ---------------- Subscribe ---------------- */
-function subscribe(){
-  const n=$("#subName").value.trim(), ct=$("#subContact").value.trim();
-  if(!ct){toast("Add an email or phone first");return;}
-  subscribers.unshift({name:n||"(no name)",contact:ct,when:new Date().toLocaleDateString()});
-  $("#subName").value="";$("#subContact").value="";
-  renderSubs(); toast("Subscribed ✓");
-}
-function renderSubs(){
-  const c=$("#sublist");
-  c.innerHTML = subscribers.length? subscribers.map((s,i)=>`
-    <div class="subitem"><div class="who"><span class="nm">${esc(s.name)}</span><span class="ct">${esc(s.contact)} · ${esc(s.when)}</span></div>
-    <button onclick="subscribers.splice(${i},1);renderSubs()" title="Remove">×</button></div>`).join("")
-    : `<div class="empty">No subscribers yet. People who opt in on the deal sheet show up here.</div>`;
-}
-
-/* ---------------- Offer text / export ---------------- */
-function offerText(){
-  const c=calc();
-  const title=[deal.year,deal.make,deal.model,deal.trim].filter(Boolean).join(" ");
-  return `${title} — Restoration flip opportunity
+function offerText(){const c=calc();const title=[deal.year,deal.make,deal.model,deal.trim].filter(Boolean).join(" ");return `${title} — Restoration flip opportunity
 ${"-".repeat(40)}
 Purchase:         ${money(deal.purchase)}
 Repairs/resto:    ${money(deal.repairs)}
@@ -527,37 +295,12 @@ Split (${deal.splitA}/${100-deal.splitA}):
 
 ${deal.desc}
 
-Interested? Reply to claim this deal.`;
-}
-function copyOffer(){
-  const t=offerText();
-  navigator.clipboard?.writeText(t).then(()=>toast("Offer text copied — paste into email or Messages"),()=>fallbackCopy(t));
-}
-function fallbackCopy(t){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();toast("Offer text copied");}
-function exportDeal(){
-  const blob=new Blob([JSON.stringify(deal,null,2)],{type:"application/json"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
-  a.download=([deal.year,deal.make,deal.model].filter(Boolean).join("_")||"deal")+".json";a.click();
-  toast("Deal file saved");
-}
-function importDeal(e){
-  const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);deal=Object.assign(deal,d);activePhoto=0;renderEditor();renderSheet();toast("Deal loaded");}catch{toast("Couldn't read that file");}};
-  r.readAsText(f);e.target.value="";
-}
+Interested? Reply to claim this deal.`;}
+function copyOffer(){const t=offerText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Offer text copied — paste into email or Messages")).catch(()=>{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();toast("Offer text copied");});}
 
-/* ---------------- Mode ---------------- */
-function setMode(m){
-  const ed=$("#editor"), wrap=$("#wrap");
-  if(m==='edit'){ed.style.display="";wrap.style.gridTemplateColumns=window.innerWidth>1000?"380px 1fr":"1fr";
-    $("#mEdit").classList.add("active");$("#mPrev").classList.remove("active");}
-  else{ed.style.display="none";wrap.style.gridTemplateColumns="1fr";
-    $("#mPrev").classList.add("active");$("#mEdit").classList.remove("active");
-    window.scrollTo({top:0,behavior:"smooth"});}
-}
+function renderAll(){renderBanner();renderOpbar();const showEditor=editing&&isOperator;$("#editor").style.display=showEditor?"":"none";$("#wrap").classList.toggle("solo",!showEditor);$("#subscard").style.display=(showSubs&&session)?"":"none";if(showEditor)renderEditor();renderSheet();if(showSubs&&session)renderSubs();}
 
-/* ---------------- Init ---------------- */
-renderEditor();renderSheet();renderSubs();
+(async function init(){renderBanner();if(sb){const {data}=await sb.auth.getSession();session=data.session||null;sb.auth.onAuthStateChange((_e,s)=>{session=s;isOperator=!!s;renderOpbar();renderBanner();});await loadDeal();}renderAll();})();
 </script>
 </body>
 </html>
