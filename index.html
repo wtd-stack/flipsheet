@@ -110,6 +110,11 @@
   @media(max-width:560px){.metastrip{grid-template-columns:1fr}.metastrip .m{border-right:0;border-bottom:1px solid var(--line-paper)}.metastrip .m:last-child{border-bottom:0}}
   .desc{padding:4px 26px 22px}.desc h3.block{font-family:'Bebas Neue';letter-spacing:1.5px;font-size:20px;margin-bottom:10px}
   .desc p{font-size:14px;color:#3a382f;white-space:pre-wrap}
+  .claimband{margin:18px 26px 14px;border-radius:12px;background:linear-gradient(135deg,var(--amber),var(--amber-deep));color:#fff;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .claimband h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:22px}
+  .claimband p{font-size:13px;color:#ffe9df;margin-top:3px}
+  .claimbtn{background:#fff;color:var(--amber-deep);border:0;font-weight:800;font-size:15px;padding:13px 22px;border-radius:10px;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+  .claimbtn:hover{background:#fff4ef}
   .cta{margin:0 26px 26px;border-radius:12px;background:#1b1e24;color:#fff;padding:20px;border:1px solid #000}
   .cta h3{font-family:'Bebas Neue';letter-spacing:1px;font-size:22px}.cta p{font-size:13px;color:#B9BCC3;margin:6px 0 14px}
   .subform{display:flex;gap:8px;flex-wrap:wrap}
@@ -140,7 +145,7 @@
   .modal input:focus{border-color:var(--amber)}
   .modal .mrow{display:flex;gap:8px;margin-top:6px}
   .modal .mrow button{flex:1;border-radius:9px;padding:11px;font-weight:700;font-size:14px;border:1px solid var(--line)}
-  @media print{.banner,.topbar,.editor,.subscard,.actionbar,.cta,.modal-bg{display:none!important}body{background:#fff}.wrap{display:block;padding:0;max-width:100%}.sheet{box-shadow:none;border:0}.sheet-top,.profitcard{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  @media print{.banner,.topbar,.editor,.subscard,.actionbar,.cta,.claimband,.modal-bg{display:none!important}body{background:#fff}.wrap{display:block;padding:0;max-width:100%}.sheet{box-shadow:none;border:0}.sheet-top,.profitcard{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -151,8 +156,8 @@
 <!--  Leaving them unchanged runs the page in safe "demo" mode.     -->
 <!-- ============================================================ -->
 <script>
-  const SUPABASE_URL      = "https://occikhzsymxkkjpwskep.supabase.co";   // e.g. https://abcd1234.supabase.co
-  const SUPABASE_ANON_KEY = "sb_publishable_kj0nCeTzvvDBqT__AatHWw_jH8peQDg";      // the long "anon public" key
+  const SUPABASE_URL      = "https://occikhzsymxkkjpwskep.supabase.co";   // your project URL (already filled in)
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";      // the long "anon public" key
 </script>
 
 <div id="banner"></div>
@@ -181,6 +186,11 @@
       <div class="sc-sub">People who opted in, saved in your database. Only you can see this.</div>
       <div class="sublist" id="sublist"></div>
     </div>
+    <div class="subscard" id="claimscard" style="display:none">
+      <h3>Claims</h3>
+      <div class="sc-sub">People who claimed this deal. Reach out to close it. Only you can see this.</div>
+      <div class="sublist" id="claimlist"></div>
+    </div>
   </div>
 </div>
 
@@ -197,6 +207,20 @@
   </div>
 </div>
 
+<div class="modal-bg" id="claimModal">
+  <div class="modal">
+    <h3>Claim this deal</h3>
+    <p id="claimDealName">Tell the seller you want it — they'll reach out.</p>
+    <input id="claimName" type="text" placeholder="Your name">
+    <input id="claimContact" type="text" placeholder="Email or phone">
+    <textarea id="claimMsg" placeholder="Anything to add? (optional)" style="width:100%;background:#0f1115;border:1px solid var(--line);color:#fff;border-radius:9px;padding:11px 13px;font-size:14px;outline:none;min-height:70px;resize:vertical;margin-bottom:10px"></textarea>
+    <div class="mrow">
+      <button class="btn-dark" onclick="closeClaim()">Cancel</button>
+      <button class="btn-primary" onclick="submitClaim()">Submit claim</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -205,25 +229,26 @@ let sb=null;
 if(CONNECTED){try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}catch(e){console.error(e);}}
 let session=null;
 let isOperator=!CONNECTED;
-let editing=false, showSubs=false;
+let editing=false, showSubs=false, showClaims=false;
 
 const CAR_SVG=(a,b)=>`data:image/svg+xml;utf8,`+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${a}'/><stop offset='1' stop-color='${b}'/></linearGradient></defs><rect width='320' height='180' fill='url(#g)'/><g fill='none' stroke='rgba(255,255,255,.85)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><path d='M50 112 l18 -34 a14 14 0 0 1 12 -7 h84 a14 14 0 0 1 12 7 l18 34'/><path d='M40 112 h214 v22 h-214 z'/><circle cx='84' cy='134' r='13'/><circle cx='210' cy='134' r='13'/></g><text x='160' y='164' fill='rgba(255,255,255,.7)' font-family='monospace' font-size='12' text-anchor='middle'>add a photo</text></svg>`);
 function sampleDeal(){return{status:"Open opportunity",year:"1972",make:"Datsun",model:"240Z",trim:"Series 1 Coupe",photos:[CAR_SVG('#cf6a3d','#8a3d1d'),CAR_SVG('#3a4a5a','#222c36'),CAR_SVG('#4c6b4a','#2c3f2b')],purchase:8500,repairs:14000,sellLow:38000,sellHigh:46000,weeks:16,splitA:50,partyA:"You (operator)",partyB:"Opportunity partner",desc:"Numbers-matching S30 found in a dry barn outside Tulsa. Solid floors and frame rails, surface rust only. Plan: full mechanical refresh, respray in original 918 orange, new interior, sympathetic restoration keeping the L24 stock. Strong, rising market for clean early Zs."};}
 
-let dealId=null, deal=sampleDeal(), activePhoto=0, subscribers=[];
+let dealId=null, deal=sampleDeal(), activePhoto=0, subscribers=[], claims=[];
 
 const $=s=>document.querySelector(s);
 const money=n=>"$"+(Math.round(n)||0).toLocaleString("en-US");
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 function toast(msg,bad){const t=$("#toast");t.textContent=msg;t.classList.toggle("bad",!!bad);t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2600);}
-function calc(){const totalIn=(+deal.purchase||0)+(+deal.repairs||0);const profLow=(+deal.sellLow||0)-totalIn,profHigh=(+deal.sellHigh||0)-totalIn;const roiLow=totalIn?profLow/totalIn*100:0,roiHigh=totalIn?profHigh/totalIn*100:0;return{totalIn,profLow,profHigh,roiLow,roiHigh,aLow:profLow*deal.splitA/100,aHigh:profHigh*deal.splitA/100,bLow:profLow*(100-deal.splitA)/100,bHigh:profHigh*(100-deal.splitA)/100};}
+function calc(){const totalIn=(+deal.purchase||0)+(+deal.repairs||0);const profLow=(+deal.sellLow||0)-totalIn,profHigh=(+deal.sellHigh||0)-totalIn;const pShare=(100-deal.splitA)/100;const roiLow=totalIn?profLow*pShare/totalIn*100:0,roiHigh=totalIn?profHigh*pShare/totalIn*100:0;return{totalIn,profLow,profHigh,roiLow,roiHigh,aLow:profLow*deal.splitA/100,aHigh:profHigh*deal.splitA/100,bLow:profLow*(100-deal.splitA)/100,bHigh:profHigh*(100-deal.splitA)/100};}
 
 function renderBanner(msg,kind){const b=$("#banner");if(!CONNECTED){b.className="banner demo";b.innerHTML="Demo mode — nothing is saved online yet. Add your Supabase keys near the top of this file (see the setup guide) to go live.";return;}if(msg){b.className="banner "+(kind||"live");b.textContent=msg;}else{b.className="banner live";b.textContent=session?("Live · signed in as "+(session.user&&session.user.email||"operator")):"Live · connected to your database";}}
 
-function renderOpbar(){const o=$("#opbar");if(!CONNECTED){o.innerHTML=`<span class="who">demo preview</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button>`;return;}if(session){o.innerHTML=`<span class="who">${esc(session.user&&session.user.email||'operator')}</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button><button class="opbtn" onclick="toggleSubs()">Subscribers</button><button class="opbtn" onclick="doLogout()">Log out</button>`;}else{o.innerHTML=`<button class="opbtn amber" onclick="openLogin()">Operator login</button>`;}}
+function renderOpbar(){const o=$("#opbar");if(!CONNECTED){o.innerHTML=`<span class="who">demo preview</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button>`;return;}if(session){o.innerHTML=`<span class="who">${esc(session.user&&session.user.email||'operator')}</span><button class="opbtn ${editing?'amber':''}" onclick="toggleEdit()">${editing?'View sheet':'Build deal'}</button><button class="opbtn" onclick="toggleSubs()">Subscribers</button><button class="opbtn" onclick="toggleClaims()">Claims</button><button class="opbtn" onclick="doLogout()">Log out</button>`;}else{o.innerHTML=`<button class="opbtn amber" onclick="openLogin()">Operator login</button>`;}}
 
-function toggleEdit(){editing=!editing;if(editing)showSubs=false;renderAll();}
-function toggleSubs(){showSubs=!showSubs;if(showSubs){editing=false;loadSubscribers();}renderAll();}
+function toggleEdit(){editing=!editing;if(editing){showSubs=false;showClaims=false;}renderAll();}
+function toggleSubs(){showSubs=!showSubs;if(showSubs){editing=false;showClaims=false;loadSubscribers();}renderAll();}
+function toggleClaims(){showClaims=!showClaims;if(showClaims){editing=false;showSubs=false;loadClaims();}renderAll();}
 
 function renderEditor(){$("#editorBody").innerHTML=`
   <div class="grouplabel">The car</div>
@@ -264,7 +289,8 @@ function renderSheet(){const c=calc();const title=[deal.year,deal.make,deal.mode
     <div class="splitbox"><div class="sb-head"><h4>Profit split</h4></div><div class="splitbar"><div class="seg a" style="flex:${Math.max(deal.splitA,8)}"><span class="seg-lab">${esc(deal.partyA)}</span><span class="seg-pct">${deal.splitA}%</span></div><div class="seg b" style="flex:${Math.max(100-deal.splitA,8)}"><span class="seg-lab">${esc(deal.partyB)}</span><span class="seg-pct">${100-deal.splitA}%</span></div></div><div class="splitvals"><div class="sv"><div class="n">${money(c.aLow)} – ${money(c.aHigh)}</div><div class="l">${esc(deal.partyA)}</div></div><div class="sv"><div class="n">${money(c.bLow)} – ${money(c.bHigh)}</div><div class="l">${esc(deal.partyB)}</div></div></div></div>
     <div class="metastrip"><div class="m"><div class="mi">${money(c.totalIn)}</div><div class="ml">Cash in</div></div><div class="m"><div class="mi">${esc(deal.weeks||"—")} wks</div><div class="ml">Turnaround</div></div><div class="m"><div class="mi">${c.roiLow.toFixed(0)}–${c.roiHigh.toFixed(0)}%</div><div class="ml">Return on cost</div></div></div></div>
   ${deal.desc?`<div class="desc"><h3 class="block">The opportunity</h3><p>${esc(deal.desc)}</p></div>`:""}
-  <div class="cta"><h3>Want first call on deals like this?</h3><p>Drop your details and get new flip opportunities sent straight to you.</p><div class="subform"><input id="subName" placeholder="Name"><input id="subContact" placeholder="Email or phone"><button onclick="subscribe()">Notify me</button></div><div class="subnote">By subscribing you agree to receive deal offers. Unsubscribe anytime.</div></div>`;}
+  <div class="claimband"><div><h3>Ready to move on this one?</h3><p>Claim it and the seller will reach out to lock in the details.</p></div><button class="claimbtn" onclick="openClaim()">Claim this deal</button></div>
+  <div class="cta"><h3>Not ready yet?</h3><p>Get future flip opportunities sent straight to you.</p><div class="subform"><input id="subName" placeholder="Name"><input id="subContact" placeholder="Email or phone"><button onclick="subscribe()">Notify me</button></div><div class="subnote">By subscribing you agree to receive deal offers. Unsubscribe anytime.</div></div>`;}
 
 async function loadDeal(){if(!sb)return;const {data,error}=await sb.from("deals").select("*").order("updated_at",{ascending:false}).limit(1);if(error){renderBanner("Couldn't load deal: "+error.message,"err");return;}if(data&&data.length){dealId=data[0].id;deal=Object.assign(sampleDeal(),data[0].data);}activePhoto=0;renderAll();}
 async function saveDeal(){if(!sb){toast("Demo mode — add Supabase keys to save online");return;}if(!session){toast("Please log in first",true);openLogin();return;}const btn=$("#saveBtn");if(btn){btn.disabled=true;btn.textContent="Saving…";}let res;if(dealId){res=await sb.from("deals").update({data:deal,updated_at:new Date().toISOString()}).eq("id",dealId).select().single();}else{res=await sb.from("deals").insert({data:deal,published:true}).select().single();}if(res.error){toast("Save failed: "+res.error.message,true);}else{dealId=res.data.id;toast("Saved — visitors now see this");}if(btn){btn.disabled=false;btn.textContent=CONNECTED?'Save to site':'Save';}}
@@ -273,6 +299,13 @@ async function subscribe(){const n=$("#subName").value.trim(),ct=$("#subContact"
 async function loadSubscribers(){if(!sb||!session){renderSubs();return;}const {data,error}=await sb.from("subscribers").select("*").order("created_at",{ascending:false});if(error){toast("Couldn't load subscribers: "+error.message,true);return;}subscribers=data||[];renderSubs();}
 function renderSubs(){const c=$("#sublist");if(!c)return;c.innerHTML=subscribers.length?subscribers.map(s=>`<div class="subitem"><div><div class="nm">${esc(s.name||"(no name)")}</div><div class="ct">${esc(s.contact)} · ${esc((s.created_at||"").slice(0,10))}</div></div>${s.id?`<button title="Remove" onclick="delSub('${s.id}')">×</button>`:""}</div>`).join(""):`<div class="empty">No subscribers yet. Sign-ups from the deal sheet appear here.</div>`;}
 async function delSub(id){if(!sb)return;const {error}=await sb.from("subscribers").delete().eq("id",id);if(error){toast(error.message,true);return;}loadSubscribers();}
+
+function openClaim(){const title=[deal.year,deal.make,deal.model].filter(Boolean).join(" ");$("#claimDealName").textContent="You're claiming: "+(title||"this deal")+". The seller will reach out.";$("#claimModal").classList.add("show");setTimeout(()=>$("#claimName").focus(),50);}
+function closeClaim(){$("#claimModal").classList.remove("show");}
+async function submitClaim(){const n=$("#claimName").value.trim(),ct=$("#claimContact").value.trim(),msg=$("#claimMsg").value.trim();if(!ct){toast("Add an email or phone so the seller can reach you",true);return;}const title=[deal.year,deal.make,deal.model].filter(Boolean).join(" ");if(!sb){claims.unshift({name:n||"(no name)",contact:ct,message:msg,deal_title:title,created_at:new Date().toISOString()});$("#claimName").value="";$("#claimContact").value="";$("#claimMsg").value="";closeClaim();toast("Claim sent (demo)");return;}const {error}=await sb.from("claims").insert({name:n||null,contact:ct,message:msg||null,deal_id:dealId,deal_title:title});if(error){toast("Couldn't send claim: "+error.message,true);return;}$("#claimName").value="";$("#claimContact").value="";$("#claimMsg").value="";closeClaim();toast("Claim sent — the seller will reach out");if(session&&showClaims)loadClaims();}
+async function loadClaims(){if(!sb||!session){renderClaims();return;}const {data,error}=await sb.from("claims").select("*").order("created_at",{ascending:false});if(error){toast("Couldn't load claims: "+error.message,true);return;}claims=data||[];renderClaims();}
+function renderClaims(){const c=$("#claimlist");if(!c)return;c.innerHTML=claims.length?claims.map(s=>`<div class="subitem"><div><div class="nm">${esc(s.name||"(no name)")}</div><div class="ct">${esc(s.contact)} · ${esc((s.created_at||"").slice(0,10))}${s.message?" · "+esc(s.message):""}</div></div>${s.id?`<button title="Remove" onclick="delClaim('${s.id}')">×</button>`:""}</div>`).join(""):`<div class="empty">No claims yet. When someone claims this deal, they appear here.</div>`;}
+async function delClaim(id){if(!sb)return;const {error}=await sb.from("claims").delete().eq("id",id);if(error){toast(error.message,true);return;}loadClaims();}
 
 function openLogin(){$("#loginModal").classList.add("show");setTimeout(()=>$("#loginEmail").focus(),50);}
 function closeLogin(){$("#loginModal").classList.remove("show");}
@@ -298,7 +331,7 @@ ${deal.desc}
 Interested? Reply to claim this deal.`;}
 function copyOffer(){const t=offerText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Offer text copied — paste into email or Messages")).catch(()=>{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();toast("Offer text copied");});}
 
-function renderAll(){renderBanner();renderOpbar();const showEditor=editing&&isOperator;$("#editor").style.display=showEditor?"":"none";$("#wrap").classList.toggle("solo",!showEditor);$("#subscard").style.display=(showSubs&&session)?"":"none";if(showEditor)renderEditor();renderSheet();if(showSubs&&session)renderSubs();}
+function renderAll(){renderBanner();renderOpbar();const showEditor=editing&&isOperator;$("#editor").style.display=showEditor?"":"none";$("#wrap").classList.toggle("solo",!showEditor);$("#subscard").style.display=(showSubs&&session)?"":"none";$("#claimscard").style.display=(showClaims&&session)?"":"none";if(showEditor)renderEditor();renderSheet();if(showSubs&&session)renderSubs();if(showClaims&&session)renderClaims();}
 
 (async function init(){renderBanner();if(sb){const {data}=await sb.auth.getSession();session=data.session||null;sb.auth.onAuthStateChange((_e,s)=>{session=s;isOperator=!!s;renderOpbar();renderBanner();});await loadDeal();}renderAll();})();
 </script>
